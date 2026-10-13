@@ -24,11 +24,17 @@ button{border:0;border-radius:6px;padding:9px 14px;font-weight:600;cursor:pointe
 .revealed-code,.target-code{display:none;margin:8px 0 0;padding:10px;max-height:180px;overflow:auto;background:#101820;color:#dbe7f0;border-radius:5px;font:12px/1.45 Consolas,monospace;white-space:pre-wrap;word-break:break-word}
 .feedback{padding:10px 14px;border-top:1px solid #d8dee5;min-height:42px}.good{color:#15803d}.bad{color:#b91c1c}.muted{color:#66717d}.status{font-size:12px;color:#66717d;margin-left:auto}
 @media(max-width:900px){.task{align-items:flex-start}.tasktext{font-size:20px}.target-area,.targetbox{width:260px}.target-reveal{width:260px}.layout{grid-template-columns:1fr;padding:14px}}
+
+.question-nav{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;background:#e9eef3;border-bottom:1px solid #d8dee5}
+.question-nav button{min-width:30px;height:30px;padding:0 7px;border:1px solid #aeb8c2;background:#fff;color:#18212b;border-radius:5px;font-size:13px}
+.question-nav button.current{background:#2563eb;color:#fff;border-color:#2563eb}
 </style>
 <style>.score-box{position:sticky;top:0;z-index:1000;margin:0 auto 10px;padding:8px 18px;width:max-content;border-radius:10px;background:#222;color:#fff;font-size:22px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18)}.score-box strong{font-size:26px}</style></head>
 <body>
 <div class="score-box"><span>Score</span><strong id="score">0</strong><span>/ 60</span></div>
 <header><h1>Cambridge IGCSE 0478 — Python Trace It</h1><p>Write Python → run it → compare the output → check your solution.</p></header>
+
+<nav id="questionNav" class="question-nav" aria-label="Choose question"></nav>
 
 <div class="task">
   <div class="tasktext">
@@ -78,56 +84,60 @@ const tasks=[
 {q:"Ask for a positive integer and reverse its digits. For example, 482 becomes 284.",out:"284",input:"482",code:"number=int(input())\nreverse=0\nwhile number>0:\n digit=number%10\n reverse=reverse*10+digit\n number=number//10\nprint(reverse)",check:o=>o.trim()=== "284"},
 {q:"Ask for a word and determine whether it is a palindrome. Print Palindrome or Not palindrome.",out:"Palindrome",input:"level",code:"word=input()\nleft=0\nright=len(word)-1\npalindrome=True\nwhile left<right:\n if word[left]!=word[right]: palindrome=False\n left=left+1\n right=right-1\nif palindrome: print(\"Palindrome\")\nelse: print(\"Not palindrome\")",check:o=>o.trim()=== "Palindrome"},
 {q:"Ask for five marks. Calculate and print the average, then print Pass if the average is at least 50, otherwise Fail.",out:"62.0\nPass",input:"55,70,48,61,76",code:"total=0\nfor i in range(5): total=total+int(input())\naverage=total/5\nprint(average)\nif average>=50: print(\"Pass\")\nelse: print(\"Fail\")",check:o=>o.trim()=== "62.0\nPass"},
-{q:"Ask for a list of numbers and print the second largest distinct value. The first input is the number of values, followed by the values.",out:"14",input:"6,12,17,5,17,9,14",code:"count=int(input())\nvalues=[]\nfor i in range(count): values.append(int(input()))\nunique=list(set(values)); unique.sort(); print(unique[-2])",check:o=>o.trim()=== "14"},
+{q:"Ask for a list of numbers and print the second largest distinct value. The first input is the number of values, followed by the values.",out:"17",input:"6,12,17,5,17,9,14",code:"count=int(input())\nvalues=[]\nfor i in range(count): values.append(int(input()))\nunique=list(set(values)); unique.sort(); print(unique[-2])",check:o=>o.trim()=== "17"},
 {q:"Ask for a list of numbers and print the longest run of consecutive equal values. The first input is the number of values, followed by the values.",out:"3",input:"8,2,2,5,5,5,3,3,1",code:"count=int(input())\nprevious=None; current=0; longest=0\nfor i in range(count):\n value=int(input())\n if value==previous: current=current+1\n else: current=1\n if current>longest: longest=current\n previous=value\nprint(longest)",check:o=>o.trim()=== "3"},
 {q:"Exam-style challenge: ask for a positive integer and determine whether it is an Armstrong number. A three-digit Armstrong number equals the sum of the cubes of its digits. Print Armstrong or Not Armstrong.",out:"Armstrong",input:"153",code:"number=int(input()); original=number; total=0\nwhile number>0:\n digit=number%10; total=total+digit**3; number=number//10\nif total==original: print(\"Armstrong\")\nelse: print(\"Not Armstrong\")",check:o=>o.trim()=== "Armstrong"},
 {q:"Final exam-style challenge: ask for a number of students, then their marks. Validate each mark so it is between 0 and 100, repeatedly asking for a replacement when invalid. Finally print the highest mark, lowest mark and average.",out:"92\n58\n75.8",input:"5,82,-4,58,105,76,91,75",code:"count=int(input()); marks=[]\nfor i in range(count):\n mark=int(input())\n while mark<0 or mark>100: mark=int(input())\n marks.append(mark)\nprint(max(marks)); print(min(marks)); print(sum(marks)/len(marks))",check:o=>o.trim()=== "92\n58\n75.8"}
 ];
 
 const hiddenTests = [
+  [{i:[],o:"Hello, world!"}],
+  [{i:[],o:"Alex"}],
+  [{i:[],o:"17"}],
+  [{i:["7"],o:"70"},{i:["4"],o:"40"},{i:["12"],o:"120"}],
+  [{i:["Maya"],o:"Hello, Maya!"},{i:["Sam"],o:"Hello, Sam!"},{i:["Jordan"],o:"Hello, Jordan!"}],
+  [{i:["72"],o:"Pass"},{i:["49"],o:"Fail"},{i:["50"],o:"Pass"},{i:["0"],o:"Fail"}],
+  [{i:["8"],o:"Positive"},{i:["-3"],o:"Negative"},{i:["0"],o:"Zero"},{i:["100"],o:"Positive"}],
   [{i:[],o:"1\n2\n3\n4\n5"}],
-  [{i:[],o:"5\n4\n3\n2\n1"}],
-  [{i:["-5, 0, 12"],o:"12"},{i:["-1, 8"],o:"8"},{i:["0, 3"],o:"3"}],
-  [{i:["-4, 125, 75"],o:"75"},{i:["101, -1, 42"],o:"42"},{i:["0"],o:"0"}],
-  [{i:["hello, password, python123"],o:"Access granted"},{i:["python, python123"],o:"Access granted"},{i:["python123"],o:"Access granted"}],
-  [{i:["5,8,13,0"],o:"26"},{i:["10,20,0"],o:"30"},{i:["-5,10,0"],o:"5"}],
-  [{i:["7,2,9,4,0"],o:"4"},{i:["1,0"],o:"1"},{i:["12,5,8,3,0"],o:"4"}],
-  [{i:["7,18,4,12,0"],o:"18"},{i:["3,9,2,15,6,0"],o:"15"},{i:["20,4,11,0"],o:"20"}],
-  [{i:["12"],o:"1\n2\n3\n4\n6\n12"},{i:["10"],o:"1\n2\n5\n10"},{i:["7"],o:"1\n7"}],
-  [{i:["7"],o:"7\n14\n21\n28\n35\n42\n49\n56\n63\n70"},{i:["3"],o:"3\n6\n9\n12\n15\n18\n21\n24\n27\n30"},{i:["12"],o:"12\n24\n36\n48\n60\n72\n84\n96\n108\n120"}],
-  [{i:["29"],o:"Prime"},{i:["30"],o:"Not prime"},{i:["2"],o:"Prime"},{i:["1"],o:"Not prime"}],
-  [{i:["5"],o:"120"},{i:["1"],o:"1"},{i:["6"],o:"720"}],
-  [{i:["18,24"],o:"6"},{i:["48,18"],o:"6"},{i:["17,19"],o:"1"}],
-  [{i:["482"],o:"284"},{i:["1203"],o:"3021"},{i:["7"],o:"7"}],
-  [{i:["level"],o:"Palindrome"},{i:["python"],o:"Not palindrome"},{i:["racecar"],o:"Palindrome"},{i:["a"],o:"Palindrome"}],
-  [{i:["55,70,48,61,76"],o:"62.0\nPass"},{i:["40,45,50,55,60"],o:"50.0\nPass"},{i:["20,30,40,50,55"],o:"39.0\nFail"}],
-  [{i:["6,12,17,5,17,9,14"],o:"14"},{i:["5,1,2,3,4,5"],o:"4"},{i:["5,10,10,8,6,4"],o:"8"}],
-  [{i:["8,2,2,5,5,5,3,3,1"],o:"3"},{i:["6,4,4,4,2,2,9"],o:"3"},{i:["5,1,2,3,4,5"],o:"1"}],
-  [{i:["153"],o:"Armstrong"},{i:["370"],o:"Armstrong"},{i:["123"],o:"Not Armstrong"},{i:["407"],o:"Armstrong"}],
-  [{i:["5,82,-4,58,105,76,91,75"],o:"92\n58\n75.8"},{i:["4,100,0,50,80"],o:"100\n0\n57.5"},{i:["3,-1,60,90"],o:"90\n60\n75.0"}]
+  [{i:[],o:"55"}],
+  [{i:["4,12,17,8,21"],o:"3"},{i:["1,2,3,4,5"],o:"0"},{i:["11,12,13,14,15"],o:"5"}],
+  [{i:["Computer"],o:"Cr"},{i:["Python"],o:"Pn"},{i:["Cambridge"],o:"Ce"}],
+  [{i:["Computer"],o:"8"},{i:["Python"],o:"6"},{i:["Cambridge"],o:"9"}],
+  [{i:["computer science"],o:"COMPUTER SCIENCE"},{i:["python"],o:"PYTHON"},{i:["Cambridge"],o:"CAMBRIDGE"}],
+  [{i:["10,20,30,40"],o:"30"},{i:["5,12,19,25"],o:"19"},{i:["8,16,24,32"],o:"24"}],
+  [{i:["54,72,87,61"],o:"87"},{i:["12,95,41,63"],o:"95"},{i:["33,28,76,51"],o:"76"}],
+  [{i:["20,35,40,55"],o:"150"},{i:["10,10,10,10"],o:"40"},{i:["3,7,11,19"],o:"40"}],
+  [{i:["9"],o:"18"},{i:["4"],o:"8"},{i:["25"],o:"50"}],
+  [{i:["14"],o:"True"},{i:["13"],o:"False"},{i:["0"],o:"True"}],
+  [{i:["1,2,3,4,5,6"],o:"1\n2\n3\n4\n5\n6"},
+   {i:["7,8,9,10"],o:"7\n8\n9\n10"},
+   {i:["2,4,6"],o:"2\n4\n6"}],
+  [{i:["85,74,63,42"],o:"A\nB\nC\nF"},
+   {i:["91,79,68,55"],o:"A\nB\nC\nF"},
+   {i:["80,70,60,59"],o:"A\nB\nC\nF"}]
 ];
 
 const sourceRequirements = [
-  [/\bwhile\b/i, /print\s*\(/i],
-  [/\bwhile\b/i, /print\s*\(/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /number/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /mark/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /password/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /\btotal\b/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /\bcount\b/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /maximum|max/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /%/i],
-  [/\binput\s*\(/i, /\bfor\b|\bwhile\b/i, /10/i, /print\s*\(/i],
-  [/\binput\s*\(/i, /%/i, /prime/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /factorial/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /%/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /%10/i],
-  [/\binput\s*\(/i, /while|for/i, /\[/i],
-  [/\binput\s*\(/i, /range\s*\(\s*5\s*\)/i, /average/i],
-  [/\binput\s*\(/i, /\bfor\b/i, /set|sort/i],
-  [/\binput\s*\(/i, /\bfor\b/i, /longest|current/i],
-  [/\binput\s*\(/i, /\bwhile\b/i, /\*\*\s*3/i],
-  [/\binput\s*\(/i, /\bfor\b/i, /\bwhile\b/i, /max\s*\(/i, /min\s*\(/i]
+  [/print\s*\(/i],
+  [/\bname\s*=/i, /print\s*\(\s*name\s*\)/i],
+  [/\ba\s*=/i, /\bb\s*=/i, /a\s*\+\s*b|b\s*\+\s*a/i],
+  [/\binput\s*\(/i, /\bnumber\b/i, /\*\s*10/i],
+  [/\binput\s*\(/i, /\bname\b/i],
+  [/\binput\s*\(/i, /\bif\b/i, /\belse\b/i, />=\s*50/i],
+  [/\binput\s*\(/i, /\bif\b/i, /\belif\b/i, /\belse\b/i],
+  [/\bfor\b/i, /\brange\s*\(\s*1\s*,\s*6\s*\)/i],
+  [/\bfor\b/i, /\btotal\b/i, /total\s*=\s*total\s*\+/i],
+  [/\binput\s*\(/i, /\bfor\b/i, /\bcount\b/i, />\s*10/i],
+  [/\bword\s*=/i, /\[\s*0\s*\]/i, /\[\s*-1\s*\]/i],
+  [/\blen\s*\(/i],
+  [/\bupper\s*\(\s*\)/i],
+  [/\bnumbers\s*=/i, /\[\s*2\s*\]/i],
+  [/\bmarks\s*=/i, /\bmax\s*\(/i],
+  [/\bfor\b/i, /\btotal\b/i],
+  [/\bdef\s+double\s*\(/i, /\breturn\b/i],
+  [/\bdef\s+is_even\s*\(/i, /%\s*2/i, /\breturn\b/i],
+  [/\[\s*\[/i, /\bfor\b/i, /\bfor\b/i],
+  [/\bdef\s+grade\s*\(/i, /\bfor\b/i, /\bif\b/i, /\belif\b/i]
 ];
 
 
@@ -138,9 +148,31 @@ function resetTaskScore(){taskScored=false;revealUsedForTask=false;}
 function awardPoints(){if(taskScored)return;score+=revealUsedForTask?1:3;taskScored=true;updateScore();}
 const editor=document.getElementById("editor"),output=document.getElementById("output"),targetOutput=document.getElementById("targetOutput"),targetCode=document.getElementById("targetCode"),targetRevealBtn=document.getElementById("targetRevealBtn"),revealBtn=document.getElementById("revealBtn"),revealedCode=document.getElementById("revealedCode"),feedback=document.getElementById("feedback"),input=document.getElementById("programInput"),status=document.getElementById("pyStatus");
 
+
+function buildQuestionNav(){
+  const nav=document.getElementById("questionNav");
+  nav.innerHTML="";
+  tasks.forEach((task,i)=>{
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.textContent=String(i+1);
+    btn.setAttribute("aria-label","Go to question "+(i+1));
+    btn.title="Go to question "+(i+1);
+    btn.addEventListener("click",()=>{n=i;loadTask();});
+    nav.appendChild(btn);
+  });
+}
+function updateQuestionNav(){
+  document.querySelectorAll("#questionNav button").forEach((btn,i)=>{
+    btn.classList.toggle("current",i===n);
+    btn.setAttribute("aria-current",i===n?"step":"false");
+  });
+}
+
 function loadTask(){
  resetTaskScore();
  document.getElementById("num").textContent=`Task ${n+1} of ${tasks.length}`;
+  updateQuestionNav();
  document.getElementById("task").textContent=tasks[n].q;
  targetOutput.textContent=tasks[n].out;
  targetCode.style.display="none";targetCode.textContent="";targetRevealBtn.textContent="Hold to reveal target Python";
@@ -249,6 +281,6 @@ async function boot(){
   console.error(e);
  }
 }
-loadTask();boot();
+buildQuestionNav();loadTask();boot();
 </script>
 </body></html>
